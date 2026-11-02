@@ -41,7 +41,7 @@ async function scheduleAlarm(seconds: number) {
 export default function Home() {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', backgroundColor: 'white', color: 'black' }}>Step 2: Local alarm test</Text>
+      <Text style={{ fontSize: 22, fontWeight: 'bold', backgroundColor: 'white', color: 'black' }}>Step 2: Local alarm test</Text>
       <Button title="Schedule in 20 seconds" onPress={() => scheduleAlarm(20)} />
       <Button
         title="Cancel all"

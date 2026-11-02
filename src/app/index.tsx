@@ -1,52 +1,56 @@
-import * as Notifications from 'expo-notifications';
-import { Alert, Button, Text, View } from 'react-native';
+   import { useState } from 'react';
+import { Alert, Button, FlatList, Text, View } from 'react-native';
+import { supabase } from '../lib/supabase';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+   type Ping = { id: number; message: string; created_at: string };
 
-async function requestPermission() {
-  const { status } = await Notifications.requestPermissionsAsync();
-  if (status !== 'granted') {
-    Alert.alert(
-      'Notifications disabled',
-      'Go to Settings > Expo Go > Notifications to enable them.'
-    );
-    return false;
-  }
-  return true;
-}
+   export default function Home() {
+     const [pings, setPings] = useState<Ping[]>([]);
 
-async function scheduleAlarm(seconds: number) {
-  if (!(await requestPermission())) return;
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'BRO ALARM',
-      body: `${seconds} seconds have passed`,
-      sound: true,
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds,
-    },
-  });
-  Alert.alert('Scheduled', `Lock your phone and wait ${seconds} seconds`);
-}
+     async function writePing() {
+       const { error } = await supabase
+         .from('ping')
+         .insert({ message: `Hello from iPhone at ${new Date().toLocaleTimeString()}` });
+       if (error) {
+         Alert.alert('Write failed', error.message);
+         return;
+       }
+       Alert.alert('Written', 'Check the Supabase dashboard.');
+     }
 
-export default function Home() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-      <Text style={{ fontSize: 22, fontWeight: 'bold', backgroundColor: 'white', color: 'black' }}>Step 2: Local alarm test</Text>
-      <Button title="Schedule in 20 seconds" onPress={() => scheduleAlarm(20)} />
-      <Button
-        title="Cancel all"
-        onPress={() => Notifications.cancelAllScheduledNotificationsAsync()}
-      />
-    </View>
-  );
-}
+     async function readPings() {
+       const { data, error } = await supabase
+         .from('ping')
+         .select('*')
+         .order('created_at', { ascending: false })
+         .limit(5);
+       if (error) {
+         Alert.alert('Read failed', error.message);
+         return;
+       }
+       setPings(data ?? []);
+     }
+
+     return (
+       <View
+         style={{
+           flex: 1,
+           alignItems: 'center',
+           justifyContent: 'center',
+           gap: 16,
+           padding: 24,
+           backgroundColor: '#fff',
+         }}
+       >
+         <Text>Step 3: Supabase connection test</Text>
+         <Button title="Write a ping" onPress={writePing} />
+         <Button title="Read last 5 pings" onPress={readPings} />
+         <FlatList
+           style={{ alignSelf: 'stretch', flexGrow: 0 }}
+           data={pings}
+           keyExtractor={(p) => String(p.id)}
+           renderItem={({ item }) => <Text>{item.message}</Text>}
+         />
+       </View>
+     );
+   }

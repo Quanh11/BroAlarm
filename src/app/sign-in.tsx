@@ -66,7 +66,7 @@ export default function SignIn() {
         />
       )}
       <TextInput
-        placeholder="Username or email"
+        placeholder="Email"
         placeholderTextColor="#5a5a5a"
         value={email}
         onChangeText={setEmail}
@@ -76,7 +76,7 @@ export default function SignIn() {
         style={inputStyle}
       />
       <TextInput
-        placeholder="Password"
+        placeholder={mode === 'sign-up' ? "Password (dont use ur email password)" : "Password"}
         placeholderTextColor="#5a5a5a"
         value={password}
         onChangeText={setPassword}

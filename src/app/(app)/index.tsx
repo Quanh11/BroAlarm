@@ -80,6 +80,7 @@ export default function Home() {
       <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
         <TextInput
           placeholder="Room code"
+          placeholderTextColor="#5a5a5a"
           value={code}
           onChangeText={(text) => setCode(text.toUpperCase())}
           autoCapitalize="characters"
